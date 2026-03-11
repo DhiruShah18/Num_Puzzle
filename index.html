@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>8-Puzzle — AI Lab</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts: Share Tech Mono (terminal) + Rajdhani (display) -->
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- ===================== MAIN MENU SCREEN ===================== -->
+  <div id="screen-menu" class="screen active">
+    <div class="scanlines"></div>
+    <div class="menu-container">
+      <div class="logo-box">
+        <span class="logo-tag">[AI CLASS]</span>
+        <h1 class="logo-title">8-PUZZLE<br/><span class="logo-sub">SOLVER</span></h1>
+        <p class="logo-desc">Heuristic Search · A* Algorithm · Manhattan Distance</p>
+      </div>
+      <div class="menu-grid-preview" id="menuPreview"></div>
+      <div class="menu-buttons">
+        <button class="btn btn-primary" id="btnStartGame">▶ START GAME</button>
+        <button class="btn btn-outline" id="btnAbout">ℹ ABOUT</button>
+      </div>
+      <div class="menu-footer">
+        <span>Artificial Intelligence — 8-Puzzle Demo</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== GAME SCREEN ===================== -->
+  <div id="screen-game" class="screen">
+    <div class="scanlines"></div>
+
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <button class="btn btn-sm" id="btnMainMenu">← MENU</button>
+      <div class="top-title">8-PUZZLE SOLVER</div>
+      <div class="algo-badge" id="algoBadge">A* SEARCH</div>
+    </header>
+
+    <div class="game-layout">
+
+      <!-- LEFT PANEL: Info + Controls -->
+      <aside class="panel panel-left">
+
+        <div class="panel-section">
+          <div class="panel-label">GAME STATUS</div>
+          <div class="stat-row"><span>MOVES</span><span id="moveCount" class="stat-val">0</span></div>
+          <div class="stat-row"><span>HEURISTIC (h)</span><span id="heuristicVal" class="stat-val">—</span></div>
+          <div class="stat-row"><span>STATUS</span><span id="statusText" class="stat-val status-play">PLAYING</span></div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-label">ALGORITHM</div>
+          <div class="algo-selector">
+            <label class="radio-label">
+              <input type="radio" name="algo" value="astar" checked /> A* Search
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="algo" value="greedy" /> Greedy BFS
+            </label>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-label">AI INFO</div>
+          <div class="info-box" id="aiInfoBox">
+            Select an algorithm and press <strong>SOLVE WITH AI</strong> to watch the puzzle solve step by step.
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-label">CONTROLS</div>
+          <button class="btn btn-primary btn-full" id="btnSolve">🤖 SOLVE WITH AI</button>
+          <button class="btn btn-outline btn-full" id="btnShuffle">🔀 SHUFFLE</button>
+          <button class="btn btn-outline btn-full" id="btnRestart">↺ RESTART</button>
+          <button class="btn btn-danger btn-full" id="btnStopSolve" style="display:none">⏹ STOP AI</button>
+        </div>
+
+      </aside>
+
+      <!-- CENTER: Puzzle Board -->
+      <main class="board-area">
+        <div class="board-wrapper">
+          <div id="puzzle-board" class="puzzle-board"></div>
+          <div id="solved-overlay" class="solved-overlay" style="display:none">
+            <div class="solved-content">
+              <div class="solved-icon">✓</div>
+              <div class="solved-title">SOLVED!</div>
+              <div class="solved-moves" id="solvedMoves"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Goal State Reference -->
+        <div class="goal-reference">
+          <div class="goal-label">GOAL STATE</div>
+          <div class="goal-grid" id="goalGrid"></div>
+        </div>
+      </main>
+
+      <!-- RIGHT PANEL: Manhattan Distance Breakdown + AI Steps -->
+      <aside class="panel panel-right">
+
+        <div class="panel-section">
+          <div class="panel-label">MANHATTAN DISTANCE</div>
+          <div class="panel-label-sub">Distance per tile to goal</div>
+          <div id="distanceBreakdown" class="distance-list"></div>
+          <div class="distance-total">
+            TOTAL h(n) = <span id="distanceTotal">—</span>
+          </div>
+        </div>
+
+        <div class="panel-section flex-grow">
+          <div class="panel-label">AI SOLUTION PATH</div>
+          <div class="panel-label-sub" id="solutionMeta"></div>
+          <div id="solutionSteps" class="steps-list">
+            <span class="muted">No solution computed yet.</span>
+          </div>
+        </div>
+
+      </aside>
+
+    </div><!-- /.game-layout -->
+  </div><!-- /#screen-game -->
+
+  <!-- ===================== ABOUT MODAL ===================== -->
+  <div id="aboutModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <h2 class="modal-title">ABOUT THIS DEMO</h2>
+      <div class="modal-body">
+        <p><strong>8-Puzzle</strong> is a classic AI search problem. The goal is to slide tiles on a 3×3 grid until they match the goal state <code>1 2 3 / 4 5 6 / 7 8 _</code>.</p>
+        <hr class="modal-hr"/>
+        <p><strong>Manhattan Distance (h)</strong><br/>
+          The heuristic estimates cost by summing, for each tile, the horizontal + vertical steps needed to reach its goal position. It never overestimates → <em>admissible</em>.
+        </p>
+        <hr class="modal-hr"/>
+        <p><strong>A* Search</strong><br/>
+          Expands the node with the lowest <code>f(n) = g(n) + h(n)</code>, where g(n) = moves so far. Finds the <em>optimal</em> (shortest) solution.
+        </p>
+        <hr class="modal-hr"/>
+        <p><strong>Greedy Best-First Search</strong><br/>
+          Expands the node with the lowest <code>h(n)</code> only. Faster but <em>not guaranteed</em> to find the optimal path.
+        </p>
+      </div>
+      <button class="btn btn-primary" id="btnCloseAbout">CLOSE</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

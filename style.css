@@ -1,0 +1,693 @@
+/* ============================================================
+   8-PUZZLE SOLVER — style.css
+   Aesthetic: Retro AI Lab / Terminal Green-on-Dark
+   ============================================================ */
+
+/* ---------- CSS Variables ---------- */
+:root {
+  --bg:         #0a0d0f;
+  --bg2:        #0f1417;
+  --bg3:        #141a1e;
+  --panel:      #111619;
+  --border:     #1e2d24;
+  --border2:    #243328;
+  --green:      #00e676;
+  --green-dim:  #00994d;
+  --green-glow: rgba(0, 230, 118, 0.18);
+  --amber:      #ffb300;
+  --red:        #ff3d57;
+  --blue:       #29b6f6;
+  --text:       #c8d8c0;
+  --text-dim:   #5c7a60;
+  --tile-bg:    #0e1f14;
+  --tile-border:#1c3824;
+  --tile-text:  #00e676;
+  --empty-bg:   #080d09;
+
+  --font-mono:  'Share Tech Mono', monospace;
+  --font-ui:    'Rajdhani', sans-serif;
+
+  --tile-size:  110px;
+  --gap:        6px;
+  --radius:     6px;
+}
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  overflow: hidden;
+}
+
+/* ---------- Scanlines overlay ---------- */
+.scanlines {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,0,0,0.08) 3px,
+    rgba(0,0,0,0.08) 4px
+  );
+  z-index: 999;
+}
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+.screen {
+  position: fixed; inset: 0;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.screen.active {
+  display: flex;
+  opacity: 1;
+}
+
+/* ============================================================
+   MAIN MENU
+   ============================================================ */
+#screen-menu {
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, #061410 0%, var(--bg) 80%);
+}
+
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  z-index: 1;
+}
+
+.logo-box {
+  text-align: center;
+}
+.logo-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green-dim);
+  letter-spacing: 4px;
+  display: block;
+  margin-bottom: 12px;
+}
+.logo-title {
+  font-family: var(--font-ui);
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--green);
+  text-shadow: 0 0 40px rgba(0,230,118,0.5), 0 0 80px rgba(0,230,118,0.2);
+  letter-spacing: 6px;
+}
+.logo-sub {
+  font-size: 48px;
+  color: var(--amber);
+  text-shadow: 0 0 30px rgba(255,179,0,0.4);
+}
+.logo-desc {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 12px;
+  letter-spacing: 2px;
+}
+
+/* Mini preview grid on menu */
+.menu-grid-preview {
+  display: grid;
+  grid-template-columns: repeat(3, 48px);
+  grid-template-rows: repeat(3, 48px);
+  gap: 4px;
+  padding: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  box-shadow: 0 0 30px var(--green-glow);
+}
+.menu-tile {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--tile-bg);
+  border: 1px solid var(--tile-border);
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--tile-text);
+}
+.menu-tile.empty { background: var(--empty-bg); border-color: #0f1f10; }
+
+.menu-buttons {
+  display: flex;
+  gap: 16px;
+}
+.menu-footer {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+/* ============================================================
+   GAME SCREEN
+   ============================================================ */
+#screen-game {
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* --- Top Bar --- */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border2);
+  flex-shrink: 0;
+}
+.top-title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 4px;
+  color: var(--green);
+}
+.algo-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--amber);
+  border: 1px solid var(--amber);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* --- Layout --- */
+.game-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr 260px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ============================================================
+   PANELS
+   ============================================================ */
+.panel {
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.panel-right {
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+.panel-left  { padding: 16px 14px; gap: 4px; }
+.panel-right { padding: 16px 14px; gap: 4px; }
+
+.panel-section {
+  margin-bottom: 20px;
+}
+.panel-section.flex-grow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--green-dim);
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 4px;
+}
+.panel-label-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+/* --- Stat Rows --- */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 12px;
+  border-bottom: 1px solid #0f1a10;
+  color: var(--text-dim);
+}
+.stat-val {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--green);
+}
+.status-play  { color: var(--green); }
+.status-solved{ color: var(--amber); }
+.status-ai    { color: var(--blue); }
+
+/* --- Algorithm Selector --- */
+.algo-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+}
+.radio-label input { accent-color: var(--green); cursor: pointer; }
+
+/* --- Info Box --- */
+.info-box {
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: var(--radius);
+  line-height: 1.6;
+}
+.info-box strong { color: var(--green); }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  border: 1px solid;
+  padding: 10px 22px;
+  transition: all 0.15s ease;
+  outline: none;
+  user-select: none;
+}
+.btn-primary {
+  background: var(--green);
+  border-color: var(--green);
+  color: #030a05;
+  font-weight: bold;
+}
+.btn-primary:hover {
+  background: #00ff87;
+  box-shadow: 0 0 20px rgba(0,230,118,0.4);
+}
+.btn-outline {
+  background: transparent;
+  border-color: var(--green-dim);
+  color: var(--green-dim);
+}
+.btn-outline:hover {
+  border-color: var(--green);
+  color: var(--green);
+  background: var(--green-glow);
+}
+.btn-danger {
+  background: transparent;
+  border-color: var(--red);
+  color: var(--red);
+}
+.btn-danger:hover {
+  background: rgba(255,61,87,0.1);
+}
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 11px;
+  background: transparent;
+  border-color: var(--border2);
+  color: var(--text-dim);
+}
+.btn-sm:hover { border-color: var(--green); color: var(--green); }
+.btn-full {
+  width: 100%;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   BOARD AREA
+   ============================================================ */
+.board-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px;
+  background: radial-gradient(ellipse 80% 80% at 50% 50%, #060f09 0%, var(--bg) 100%);
+}
+
+.board-wrapper {
+  position: relative;
+}
+
+/* The 3×3 puzzle grid */
+.puzzle-board {
+  display: grid;
+  grid-template-columns: repeat(3, var(--tile-size));
+  grid-template-rows: repeat(3, var(--tile-size));
+  gap: var(--gap);
+  padding: 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 1px #0a1a0c,
+    0 0 40px rgba(0,230,118,0.08),
+    inset 0 0 20px rgba(0,0,0,0.4);
+}
+
+/* ---- Tiles ---- */
+.tile {
+  width: var(--tile-size);
+  height: var(--tile-size);
+  background: var(--tile-bg);
+  border: 1px solid var(--tile-border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(.4,0,.2,1),
+              background 0.15s ease,
+              box-shadow 0.15s ease;
+  position: relative;
+  user-select: none;
+}
+
+.tile:hover:not(.empty):not(.no-move) {
+  background: #142819;
+  border-color: var(--green);
+  box-shadow: 0 0 14px var(--green-glow);
+  transform: scale(1.04);
+}
+
+.tile.movable {
+  border-color: #2a5c30;
+  box-shadow: 0 0 10px rgba(0,230,118,0.12);
+}
+
+.tile.empty {
+  background: var(--empty-bg);
+  border-color: #0c1a0d;
+  cursor: default;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* Tile number */
+.tile-num {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 36px;
+  color: var(--tile-text);
+  line-height: 1;
+  text-shadow: 0 0 12px rgba(0,230,118,0.3);
+}
+
+/* Manhattan distance badge on tile */
+.tile-dist {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--green-dim);
+  margin-top: 4px;
+  opacity: 0.8;
+}
+.tile-dist-zero { color: #1a4d20; }
+
+/* Tile in place (distance 0) */
+.tile.in-place {
+  border-color: #1c4022;
+  background: #0c1c0e;
+}
+.tile.in-place .tile-num { color: #2a7a30; text-shadow: none; }
+
+/* "Slide" animation */
+@keyframes slide-pop {
+  0%   { transform: scale(0.93); }
+  60%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+.tile.just-moved {
+  animation: slide-pop 0.22s ease forwards;
+}
+
+/* Solved overlay */
+.solved-overlay {
+  position: absolute; inset: 0;
+  background: rgba(6,14,8,0.92);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.solved-content { text-align: center; }
+.solved-icon {
+  font-size: 64px;
+  color: var(--green);
+  text-shadow: 0 0 40px rgba(0,230,118,0.6);
+  animation: pulse 1.5s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { text-shadow: 0 0 40px rgba(0,230,118,0.6); }
+  50% { text-shadow: 0 0 70px rgba(0,230,118,1); }
+}
+.solved-title {
+  font-family: var(--font-ui);
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--amber);
+  letter-spacing: 6px;
+  margin-top: 8px;
+}
+.solved-moves {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  letter-spacing: 2px;
+}
+
+/* ---- Goal Reference ---- */
+.goal-reference {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.goal-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+}
+.goal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 32px);
+  grid-template-rows: repeat(3, 32px);
+  gap: 3px;
+}
+.goal-cell {
+  display: flex; align-items: center; justify-content: center;
+  background: #0a1a0c;
+  border: 1px solid #122016;
+  border-radius: 3px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  color: #2a5c30;
+}
+.goal-cell.goal-empty { background: #060e07; border-color: #0a140b; color: transparent; }
+
+/* ============================================================
+   DISTANCE BREAKDOWN (Right Panel)
+   ============================================================ */
+.distance-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.dist-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: var(--bg2);
+  border-radius: 3px;
+  font-size: 12px;
+}
+.dist-row .tile-id {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--green);
+  width: 18px;
+}
+.dist-row .dist-bar-wrap {
+  flex: 1;
+  height: 4px;
+  background: #101a12;
+  border-radius: 2px;
+  margin: 0 10px;
+}
+.dist-bar {
+  height: 100%;
+  background: var(--green-dim);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+.dist-row .dist-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  width: 16px;
+  text-align: right;
+}
+.dist-row.zero .dist-bar { background: #1a4020; }
+.dist-row.zero .dist-num { color: #1e3c20; }
+
+.distance-total {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--green);
+  text-align: right;
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+}
+.distance-total span {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--amber);
+}
+
+/* ---- Solution Steps List ---- */
+.steps-list {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.8;
+  padding-right: 4px;
+}
+.steps-list::-webkit-scrollbar { width: 4px; }
+.steps-list::-webkit-scrollbar-track { background: transparent; }
+.steps-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.step-item {
+  display: flex;
+  gap: 8px;
+  padding: 2px 0;
+  border-bottom: 1px solid #0d160e;
+  transition: color 0.2s;
+}
+.step-item.active { color: var(--green); }
+.step-num { color: var(--text-dim); width: 24px; text-align: right; flex-shrink: 0; }
+.step-dir { color: var(--amber); }
+.step-h   { color: var(--blue); font-size: 10px; margin-left: auto; flex-shrink: 0; }
+
+.muted { color: var(--text-dim); font-size: 11px; }
+
+/* ============================================================
+   ABOUT MODAL
+   ============================================================ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9000;
+}
+.modal-box {
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 0 60px rgba(0,230,118,0.15);
+}
+.modal-title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--green);
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+.modal-body p { font-size: 13px; line-height: 1.7; color: var(--text); margin-bottom: 12px; }
+.modal-body strong { color: var(--amber); }
+.modal-body code {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.modal-body em { color: var(--blue); font-style: normal; }
+.modal-hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+
+/* ============================================================
+   SCROLLBARS (global)
+   ============================================================ */
+* { scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+
+/* ============================================================
+   RESPONSIVE (tablet)
+   ============================================================ */
+@media (max-width: 900px) {
+  :root { --tile-size: 90px; }
+  .game-layout {
+    grid-template-columns: 200px 1fr;
+    grid-template-rows: 1fr auto;
+  }
+  .panel-right { display: none; }
+  .logo-title { font-size: 52px; }
+}
+@media (max-width: 640px) {
+  :root { --tile-size: 80px; }
+  .game-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  .panel-left { flex-direction: row; flex-wrap: wrap; padding: 10px; gap: 0; }
+  .panel-section { min-width: 140px; margin-right: 12px; }
+  .logo-title { font-size: 40px; }
+  .logo-sub { font-size: 32px; }
+}
