@@ -1,7 +1,6 @@
-# Num_Puzzle
 # 🧩 8-Puzzle Solver
 
-
+# Live Demo: https://dhirushah18.github.io/Num_Puzzle/
 ## 📖 About
 
 The **8-Puzzle Solver** is an interactive browser-based demo built for an Artificial Intelligence class. It lets you manually slide tiles or watch an AI algorithm solve the puzzle step by step — with real-time heuristic feedback.
@@ -101,9 +100,16 @@ Built entirely with the **Web Audio API** — no external audio files needed:
 
 ---
 
-## 📸 Screenshot
+## 📸 Screenshots
 
-> *Retro terminal green-on-dark UI with live Manhattan Distance breakdown*
+### Main Menu
+![Start Screen](Start.png)
+
+### Game Board
+![Main Page](main_page.png)
+
+### Puzzle Solved
+![Solved](solved.png)
 
 ---
 
@@ -112,3 +118,4 @@ Built entirely with the **Web Audio API** — no external audio files needed:
 **Dhirajan Shah**
 Artificial Intelligence Class Project
 
+---
